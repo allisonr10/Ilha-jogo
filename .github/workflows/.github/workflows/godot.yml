@@ -1,1 +1,33 @@
+name: "Godot Android Export"
 
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  export-android:
+    name: Android Export
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-sdk@v3
+
+      - name: Create export directory
+        run: mkdir -p build/android
+
+      - name: Export APK
+        run: godot --headless --export-release "Android" build/android/meu-jogo.apk
+        
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/android/meu-jogo.apk
