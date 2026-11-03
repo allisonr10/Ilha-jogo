@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-android:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     container:
       image: barichello/godot-ci:4.3
 
@@ -16,29 +16,29 @@ jobs:
       - name: Baixar codigo
         uses: actions/checkout@v4
 
-      - name: Preparar ambiente Android
+      - name: Preparar ambiente
         shell: bash
         run: |
-          mkdir -p ~/.config/godot
-          mkdir -p ~/.local/share/godot/export_templates
-
-          cp -a /root/.config/godot/. ~/.config/godot/
-          cp -a /root/.local/share/godot/export_templates/4.3.stable ~/.local/share/godot/export_templates/
-
+          mkdir -p "$HOME/.config/godot"
           SETTINGS="$HOME/.config/godot/editor_settings-4.3.tres"
-
-          touch "$SETTINGS"
-          sed -i '/^export\/android\/java_sdk_path =/d' "$SETTINGS"
-          sed -i '/^export\/android\/android_sdk_path =/d' "$SETTINGS"
 
           echo 'export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"' >> "$SETTINGS"
           echo 'export/android/android_sdk_path = "/usr/lib/android-sdk"' >> "$SETTINGS"
+          echo 'export/android/debug_keystore = "/root/debug.keystore"' >> "$SETTINGS"
+          echo 'export/android/debug_keystore_user = "androiddebugkey"' >> "$SETTINGS"
+          echo 'export/android/debug_keystore_pass = "android"' >> "$SETTINGS"
 
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          java -version
-
-      - name: Importar projeto
-        run: godot --headless --editor --path . --quit
+      - name: Instalar ferramentas Android
+        shell: bash
+        run: |
+          yes | sdkmanager --sdk_root=/usr/lib/android-sdk --licenses
+          sdkmanager --sdk_root=/usr/lib/android-sdk \
+            "platform-tools" \
+            "build-tools;33.0.2" \
+            "platforms;android-33" \
+            "cmdline-tools;latest" \
+            "cmake;3.22.1" \
+            "ndk;25.2.9519653"
 
       - name: Gerar APK
         run: |
