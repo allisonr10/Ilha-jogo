@@ -42,10 +42,27 @@ jobs:
             "cmake;3.10.2.4988404" \
             "ndk;23.2.8568313"
 
+      
       - name: Gerar APK
+        shell: bash
+        env:
+          GODOT_ANDROID_KEYSTORE_DEBUG_PATH: /root/debug.keystore
+          GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
+          GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
         run: |
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/Ilha-dos-Desesperados.apk
+          godot --headless --verbose --path . \
+            --export-debug "Android" \
+            build/Ilha-dos-Desesperados.apk 2>&1 | tee build/export.log
+
+      - name: Salvar log de exportacao
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-exportacao
+          path: build/export.log
+          if-no-files-found: ignore
+
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
