@@ -1,4 +1,4 @@
-      - name: Diagnosticar SDK Android
+name: Diagnosticar SDK Android
         shell: bash
         run: |
           echo "=== Build Tools ==="
