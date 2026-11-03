@@ -52,8 +52,9 @@ jobs:
         run: |
           mkdir -p build
           godot --headless --verbose --path . \
-            --export-debug "Android" \
-            build/Ilha-dos-Desesperados.apk 2>&1 | tee build/export.log
+  --install-android-build-template \
+  --export-debug "Android" \
+  build/Ilha-dos-Desesperados.apk
 
       - name: Salvar log de exportacao
         if: always()
