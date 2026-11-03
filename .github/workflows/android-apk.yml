@@ -25,17 +25,24 @@ jobs:
           cp -a /root/.config/godot/. "$HOME/.config/godot/"
           cp -a /root/.local/share/godot/export_templates/. "$HOME/.local/share/godot/export_templates/"
 
+      
       - name: Diagnosticar Android
         shell: bash
         run: |
-          echo "=== Java ==="
-          java -version
-          echo "=== SDK ==="
-          ls -la /usr/lib/android-sdk/build-tools/
-          echo "=== Keystore ==="
-          ls -l /root/debug.keystore || true
-          echo "=== Templates ==="
-          ls -la "$HOME/.local/share/godot/export_templates/"
+          echo "=== Build Tools version ==="
+          cat /usr/lib/android-sdk/build-tools/33.0.2/source.properties
+
+          echo "=== Android SDK variables ==="
+          env | grep -E 'ANDROID|JAVA_HOME' || true
+
+          echo "=== Godot Android settings ==="
+          grep -in 'android' "$HOME/.config/godot/editor_settings-4.3.tres" || true
+
+          echo "=== SDK platforms ==="
+          ls -la /usr/lib/android-sdk/platforms/
+
+          echo "=== Build Tools files ==="
+          ls -la /usr/lib/android-sdk/build-tools/33.0.2/
 
       - name: Gerar APK
         run: |
