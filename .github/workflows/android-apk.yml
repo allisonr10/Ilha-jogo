@@ -17,13 +17,16 @@ jobs:
       - name: Baixar codigo
         uses: actions/checkout@v4
 
+
       - name: Preparar ambiente Godot
         shell: bash
         run: |
           mkdir -p "$HOME/.config/godot"
           mkdir -p "$HOME/.local/share/godot/export_templates"
+
           cp -a /root/.config/godot/. "$HOME/.config/godot/"
-          cp -a /root/.local/share/godot/export_templates/. 
+
+          cp -a /root/.local/share/godot/export_templates/. "$HOME/.local/share/godot/export_templates/"
 
           
       - name: Instalar ferramentas Android
