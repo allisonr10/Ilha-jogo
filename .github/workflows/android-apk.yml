@@ -1,27 +1,49 @@
+
 name: Gerar APK Android
 
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
 
 jobs:
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: barichello/godot-ci:4.3
+
     steps:
       - name: Baixar codigo
         uses: actions/checkout@v4
 
-      - name: Preparar arquivos
+      - name: Preparar ambiente Android
+        shell: bash
         run: |
-          mkdir -p scenes scripts build
-          cp main.tscn scenes/main.tscn
-          cp main.gd scripts/main.gd
+          mkdir -p ~/.config/godot
+          mkdir -p ~/.local/share/godot/export_templates
+
+          cp -a /root/.config/godot/. ~/.config/godot/
+          cp -a /root/.local/share/godot/export_templates/4.3.stable ~/.local/share/godot/export_templates/
+
+          SETTINGS="$HOME/.config/godot/editor_settings-4.3.tres"
+
+          touch "$SETTINGS"
+          sed -i '/^export\/android\/java_sdk_path =/d' "$SETTINGS"
+          sed -i '/^export\/android\/android_sdk_path =/d' "$SETTINGS"
+
+          echo 'export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"' >> "$SETTINGS"
+          echo 'export/android/android_sdk_path = "/usr/lib/android-sdk"' >> "$SETTINGS"
+
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          java -version
+
+      - name: Importar projeto
+        run: godot --headless --editor --path . --quit
 
       - name: Gerar APK
-        run: godot --headless --path . --export-debug "Android" build/Ilha-dos-Desesperados.apk
+        run: |
+          mkdir -p build
+          godot --headless --path . --export-debug "Android" build/Ilha-dos-Desesperados.apk
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
