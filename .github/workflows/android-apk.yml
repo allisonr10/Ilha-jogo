@@ -23,26 +23,21 @@ jobs:
           mkdir -p "$HOME/.config/godot"
           mkdir -p "$HOME/.local/share/godot/export_templates"
           cp -a /root/.config/godot/. "$HOME/.config/godot/"
-          cp -a /root/.local/share/godot/export_templates/. "$HOME/.local/share/godot/export_templates/"
+          cp -a /root/.local/share/godot/export_templates/. 
 
-      
-      - name: Diagnosticar Android
+          
+      - name: Instalar ferramentas Android
         shell: bash
         run: |
-          echo "=== Build Tools version ==="
-          cat /usr/lib/android-sdk/build-tools/33.0.2/source.properties
+          yes | sdkmanager --sdk_root=/usr/lib/android-sdk --licenses || true
 
-          echo "=== Android SDK variables ==="
-          env | grep -E 'ANDROID|JAVA_HOME' || true
-
-          echo "=== Godot Android settings ==="
-          grep -in 'android' "$HOME/.config/godot/editor_settings-4.3.tres" || true
-
-          echo "=== SDK platforms ==="
-          ls -la /usr/lib/android-sdk/platforms/
-
-          echo "=== Build Tools files ==="
-          ls -la /usr/lib/android-sdk/build-tools/33.0.2/
+          sdkmanager --sdk_root=/usr/lib/android-sdk \
+            "platform-tools" \
+            "build-tools;34.0.0" \
+            "platforms;android-34" \
+            "cmdline-tools;latest" \
+            "cmake;3.10.2.4988404" \
+            "ndk;23.2.8568313"
 
       - name: Gerar APK
         run: |
