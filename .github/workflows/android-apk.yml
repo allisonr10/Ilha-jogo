@@ -17,7 +17,6 @@ jobs:
       - name: Baixar codigo
         uses: actions/checkout@v4
 
-
       - name: Preparar ambiente Godot
         shell: bash
         run: |
@@ -25,10 +24,8 @@ jobs:
           mkdir -p "$HOME/.local/share/godot/export_templates"
 
           cp -a /root/.config/godot/. "$HOME/.config/godot/"
-
           cp -a /root/.local/share/godot/export_templates/. "$HOME/.local/share/godot/export_templates/"
 
-          
       - name: Instalar ferramentas Android
         shell: bash
         run: |
@@ -42,7 +39,6 @@ jobs:
             "cmake;3.10.2.4988404" \
             "ndk;23.2.8568313"
 
-      
       - name: Gerar APK
         shell: bash
         env:
@@ -50,11 +46,15 @@ jobs:
           GODOT_ANDROID_KEYSTORE_DEBUG_USER: androiddebugkey
           GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
         run: |
+          set -o pipefail
           mkdir -p build
+
           godot --headless --verbose --path . \
-  --install-android-build-template \
-  --export-debug "Android" \
-  build/Ilha-dos-Desesperados.apk
+            --install-android-build-template
+
+          godot --headless --verbose --path . \
+            --export-debug "Android" \
+            build/Ilha-dos-Desesperados.apk 2>&1 | tee build/export.log
 
       - name: Salvar log de exportacao
         if: always()
@@ -63,7 +63,6 @@ jobs:
           name: log-exportacao
           path: build/export.log
           if-no-files-found: ignore
-
 
       - name: Disponibilizar APK
         uses: actions/upload-artifact@v4
