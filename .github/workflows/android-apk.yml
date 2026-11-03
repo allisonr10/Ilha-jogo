@@ -16,32 +16,24 @@ jobs:
       - name: Baixar codigo
         uses: actions/checkout@v4
 
-      - name: Preparar ambiente
+      - name: Preparar ambiente Godot
         shell: bash
         run: |
           mkdir -p "$HOME/.config/godot"
-          SETTINGS="$HOME/.config/godot/editor_settings-4.3.tres"
+          mkdir -p "$HOME/.local/share/godot/export_templates"
 
-          echo 'export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"' >> "$SETTINGS"
-          echo 'export/android/android_sdk_path = "/usr/lib/android-sdk"' >> "$SETTINGS"
-          echo 'export/android/debug_keystore = "/root/debug.keystore"' >> "$SETTINGS"
-          echo 'export/android/debug_keystore_user = "androiddebugkey"' >> "$SETTINGS"
-          echo 'export/android/debug_keystore_pass = "android"' >> "$SETTINGS"
+          cp -a /root/.config/godot/. "$HOME/.config/godot/"
+          cp -a /root/.local/share/godot/export_templates/. "$HOME/.local/share/godot/export_templates/"
 
-      
-      - name: Instalar ferramentas Android
-        shell: bash
+          echo "Verificando configuracoes:"
+          cat "$HOME/.config/godot/editor_settings-4.3.tres"
+          ls "$HOME/.local/share/godot/export_templates/4.3.stable"
+
+      - name: Verificar ferramentas
         run: |
-          set +o pipefail
-          yes | sdkmanager --sdk_root=/usr/lib/android-sdk --licenses
-          sdkmanager --sdk_root=/usr/lib/android-sdk \
-            "platform-tools" \
-            "build-tools;33.0.2" \
-            "platforms;android-33" \
-            "cmdline-tools;latest" \
-            "cmake;3.22.1" \
-            "ndk;25.2.9519653"
-
+          java -version
+          ls /usr/lib/android-sdk/build-tools/33.0.2
+          ls /usr/lib/android-sdk/platforms/android-33
 
       - name: Gerar APK
         run: |
