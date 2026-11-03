@@ -1,20 +1,11 @@
-name: Diagnosticar SDK Android
-        shell: bash
-        run: |
-          echo "=== Build Tools ==="
-          cat /usr/lib/android-sdk/build-tools/33.0.2/source.properties
-          echo "=== Apksigner ==="
-          /usr/lib/android-sdk/build-tools/33.0.2/apksigner version || true
-          echo "=== Keystore ==="
-          ls -l /root/debug.keystore || true
-          echo "=== Configuracao Godot ==="
-          cat "$HOME/.config/godot/editor_settings-4.3.tres"
+
 name: Gerar APK Android
 
 on:
   workflow_dispatch:
   push:
-    branches: [main, master]
+    branches:
+      - main
 
 jobs:
   build-android:
@@ -31,19 +22,20 @@ jobs:
         run: |
           mkdir -p "$HOME/.config/godot"
           mkdir -p "$HOME/.local/share/godot/export_templates"
-
           cp -a /root/.config/godot/. "$HOME/.config/godot/"
           cp -a /root/.local/share/godot/export_templates/. "$HOME/.local/share/godot/export_templates/"
 
-          echo "Verificando configuracoes:"
-          cat "$HOME/.config/godot/editor_settings-4.3.tres"
-          ls "$HOME/.local/share/godot/export_templates/4.3.stable"
-
-      - name: Verificar ferramentas
+      - name: Diagnosticar Android
+        shell: bash
         run: |
+          echo "=== Java ==="
           java -version
-          ls /usr/lib/android-sdk/build-tools/33.0.2
-          ls /usr/lib/android-sdk/platforms/android-33
+          echo "=== SDK ==="
+          ls -la /usr/lib/android-sdk/build-tools/
+          echo "=== Keystore ==="
+          ls -l /root/debug.keystore || true
+          echo "=== Templates ==="
+          ls -la "$HOME/.local/share/godot/export_templates/"
 
       - name: Gerar APK
         run: |
